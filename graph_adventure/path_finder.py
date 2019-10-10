@@ -50,6 +50,7 @@ def path_finder(world):
     """
     current_room = world.startingRoom
     visited.add(current_room)
+    return_path.append(current_room)
 
     while len(visited) < num_rooms:
         if len(dead_ends) > 0:
@@ -120,13 +121,17 @@ def path_finder(world):
                     else:
                         connections.remove(c)
             # TODO: Implement BFS to nearest unexplored
+            new_path = bfs_nearest_unexplored(current_room, visited)
+            current_room = new_path[-1]
+            visited.add(current_room)
+            return_path += new_path
 
 
-    print("**********\nReturn Path")
-    for i in return_path:
-        print(i.id)
+    # print("**********\nReturn Path")
+    # for i in return_path:
+    #     print(i.id)
 
-    print("\n\n********")
+    # print("\n\n********")
 
     actual_return_path = []
     for i in range(0, len(return_path)-1):
@@ -139,6 +144,7 @@ def path_finder(world):
         if return_path[i].w_to == return_path[i+1]:
             actual_return_path.append("w")
 
+    print(actual_return_path)
     return actual_return_path
 
 def bfs(source_room, destination_room):
@@ -158,7 +164,7 @@ def bfs(source_room, destination_room):
 
         if vertex.id not in visited:
             if vertex.id == destination_room.id:
-                return path
+                return path[1:]
             visited.add(vertex.id)
 
             #Getting connections
@@ -176,3 +182,37 @@ def bfs(source_room, destination_room):
                 new_path.append(r)
                 q.insert(0, new_path)
 
+def bfs_nearest_unexplored(source_room, main_visited):
+    visited = set()
+    
+    q = [[source_room]]
+
+    while q:
+        path = q.pop()
+        vertex = path[-1]
+
+        print_str = ""
+        for i in path:
+            print_str += f" {i.id}"
+
+        # print(print_str)
+
+        if vertex.id not in visited:
+            if vertex not in main_visited:
+                return path[1:]
+            visited.add(vertex.id)
+
+            #Getting connections
+            connections = []
+            if vertex.n_to and vertex.n_to.id not in visited:
+                connections.append(vertex.n_to)
+            if vertex.s_to and vertex.s_to.id not in visited:
+                connections.append(vertex.s_to)
+            if vertex.e_to and vertex.e_to.id not in visited:
+                connections.append(vertex.e_to)
+            if vertex.w_to and vertex.w_to.id not in visited:
+                connections.append(vertex.w_to)
+            for r in connections:
+                new_path = list(path)
+                new_path.append(r)
+                q.insert(0, new_path)

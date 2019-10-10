@@ -1,6 +1,7 @@
 from room import Room
 from player import Player
 from world import World
+from path_finder import path_finder
 
 import random
 
@@ -21,7 +22,7 @@ player = Player("Name", world.startingRoom)
 
 
 # FILL THIS IN
-traversalPath = ['n', 's']
+traversalPath = path_finder(world)
 
 
 # TRAVERSAL TEST

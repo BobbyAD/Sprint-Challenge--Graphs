@@ -92,6 +92,7 @@ def path_finder(world):
             if current_room.w_to:
                 connections.append(current_room.w_to)
             unexplored_connections = False
+
             for c in connections:
                 if c not in visited:
                     unexplored_connections = True
@@ -100,6 +101,25 @@ def path_finder(world):
             while unexplored_connections == True:
                 # TODO: Weight this to pick a random direction
                 current_room = connections[0]
+                visited.add(current_room)
+                return_path.append(current_room)
+                connections = []
+                if current_room.n_to:
+                    connections.append(current_room.n_to)
+                if current_room.s_to:
+                    connections.append(current_room.s_to)
+                if current_room.e_to:
+                    connections.append(current_room.e_to)
+                if current_room.w_to:
+                    connections.append(current_room.w_to)
+
+                unexplored_connections = False
+                for c in connections:
+                    if c not in visited:
+                        unexplored_connections = True
+                    else:
+                        connections.remove(c)
+            # TODO: Implement BFS to nearest unexplored
 
 
     print("**********\nReturn Path")

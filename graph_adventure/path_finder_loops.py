@@ -1,3 +1,4 @@
+from random import random
 from room import Room
 from player import Player
 from world import World
@@ -20,34 +21,83 @@ world.loadGraph(roomGraph)
 world.printRooms()
 player = Player("Name", world.startingRoom)
 
+# I think if I differentiate between "loops" and "branches" I can solve it as effectively as possible. 
+# Go to nearest loop (it actually starts on 000 in this maze)
+# DFT -> BFT all paths in each non-loop branch on the node
+# Progress down the loop, remove previous node from the loop (pop it off whichever direction I'm going)
+# When you reach the end of a loop, go to the nearest point in any remaining loops
 
-# FILL THIS IN
-traversalPath = path_finder(world)
+def path_finder_loops(world):
+    loop_finder = dfs_find_loops(world)
+    loops = loop_finder[0]
+    loop_rooms = loop_finder[1]
+
+    num_rooms = len(world.rooms)
+    visited = set()
+    return_path = []
+    current_room = world.startingRoom
+    
+    while len(visited) < num_rooms:
+        if current_room in loop_rooms:
+            pass
 
 
-# TRAVERSAL TEST
-visited_rooms = set()
-player.currentRoom = world.startingRoom
-visited_rooms.add(player.currentRoom)
-for move in traversalPath:
-    player.travel(move)
-    visited_rooms.add(player.currentRoom)
+# This finds all 3 loops in the world, returns a list -> [loops, in_loops]. [0] is a list of all loop lists, [1] is a list of all ids in a loop
+def dfs_find_loops(world):
+    in_loops = set()
+    loops = []
+    for room in world.rooms:
+        current_room = world.rooms[room]
+        if current_room not in in_loops:
+            visited = set()
+            stack = [[current_room]]
 
-if len(visited_rooms) == len(roomGraph):
-    print(f"TESTS PASSED: {len(traversalPath)} moves, {len(visited_rooms)} rooms visited")
-else:
-    print("TESTS FAILED: INCOMPLETE TRAVERSAL")
-    print(f"{len(roomGraph) - len(visited_rooms)} unvisited rooms")
+            while stack:
+                path = stack.pop()
+                vertex = path[-1]
+                if vertex.id not in visited:
+                    visited.add(vertex.id)
 
+                    connections = []
+                    if vertex.n_to:
+                        if vertex.n_to.id == current_room.id and len(path) > 3:
+                            loops.append(path)
+                            for x in path:
+                                in_loops.add(x)
+                        if vertex.n_to.id not in visited:
+                            connections.append(vertex.n_to)
+                    if vertex.e_to:
+                        if vertex.e_to.id == current_room.id and len(path) > 3:
+                            loops.append(path)
+                            for x in path:
+                                in_loops.add(x)
+                        if vertex.e_to.id not in visited:
+                            connections.append(vertex.e_to)
+                    if vertex.s_to:
+                        if vertex.s_to.id == current_room.id and len(path) > 3:
+                            loops.append(path)
+                            for x in path:
+                                in_loops.add(x)
+                        if vertex.s_to.id not in visited:
+                            connections.append(vertex.s_to)
+                    if vertex.w_to:
+                        if vertex.w_to.id == current_room.id and len(path) > 3:
+                            loops.append(path)
+                            for x in path:
+                                in_loops.add(x)
+                        if vertex.w_to.id not in visited:
+                            connections.append(vertex.w_to)
+                    for r in connections:
+                        new_path = list(path)
+                        new_path.append(r)
+                        stack.append(new_path)
+    for i in loops:
+        new_str = "["
+        for y in i:
+            new_str += f" {y.id}"
+        new_str += "]"
+        print(new_str)
 
+    return [loops, in_loops]
 
-#######
-# UNCOMMENT TO WALK AROUND
-#######
-# player.currentRoom.printRoomDescription(player)
-# while True:
-#     cmds = input("-> ").lower().split(" ")
-#     if cmds[0] in ["n", "s", "e", "w"]:
-#         player.travel(cmds[0], True)
-#     else:
-#         print("I did not understand that command.")
+path_finder_loops(world)

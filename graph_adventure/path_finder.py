@@ -1,3 +1,5 @@
+from random import random
+
 # Go through all directions for each node
 # I need a way to build "paths" and return the shortest overall. Shortest for each break intersection? How do I handle this?
 
@@ -53,43 +55,43 @@ def path_finder(world):
     return_path.append(current_room)
 
     while len(visited) < num_rooms:
-        if len(dead_ends) > 0:
-            # I need to find the CLOSEST room where I don't overlap visited, else just shortest room
-            shortest = None
-            shortest_no_visited = None
-            dead_end_paths = []
-            for i in dead_ends:
-                dead_end_paths.append(bfs(current_room, i))
-            for i in dead_end_paths:
-                if shortest == None:
-                    shortest = i
-                elif shortest and len(i) < len(shortest):
-                    shortest = i
-                if shortest_no_visited == None and not visited & set(i):
-                    shortest_no_visited = i
-                elif shortest_no_visited and len(i) < len(shortest_no_visited) and not visited & set(i):
-                    shortest_no_visited = i
+        # if len(dead_ends) > 0:
+        #     # I need to find the CLOSEST room where I don't overlap visited, else just shortest room
+        #     shortest = None
+        #     shortest_no_visited = None
+        #     dead_end_paths = []
+        #     for i in dead_ends:
+        #         dead_end_paths.append(bfs(current_room, i))
+        #     for i in dead_end_paths:
+        #         if shortest == None:
+        #             shortest = i
+        #         elif shortest and len(i) < len(shortest):
+        #             shortest = i
+        #         if shortest_no_visited == None and not visited & set(i):
+        #             shortest_no_visited = i
+        #         elif shortest_no_visited and len(i) < len(shortest_no_visited) and not visited & set(i):
+        #             shortest_no_visited = i
 
-            if shortest_no_visited:
-                return_path += shortest_no_visited
-                for i in shortest_no_visited:
-                    visited.add(i)
-                current_room = shortest_no_visited[-1]
-                dead_ends.remove(current_room)
-            else:
-                return_path += shortest
-                for i in shortest:
-                    visited.add(i)
-                current_room = shortest[-1]
-                dead_ends.remove(current_room)
-        else:
+        #     if shortest_no_visited:
+        #         return_path += shortest_no_visited
+        #         for i in shortest_no_visited:
+        #             visited.add(i)
+        #         current_room = shortest_no_visited[-1]
+        #         dead_ends.remove(current_room)
+        #     else:
+        #         return_path += shortest
+        #         for i in shortest:
+        #             visited.add(i)
+        #         current_room = shortest[-1]
+        #         dead_ends.remove(current_room)
+        # else:
             connections = []
             if current_room.n_to:
                 connections.append(current_room.n_to)
-            if current_room.s_to:
-                connections.append(current_room.s_to)
             if current_room.e_to:
                 connections.append(current_room.e_to)
+            if current_room.s_to:
+                connections.append(current_room.s_to)
             if current_room.w_to:
                 connections.append(current_room.w_to)
             unexplored_connections = False
@@ -101,16 +103,17 @@ def path_finder(world):
                     connections.remove(c)
             while unexplored_connections == True:
                 # TODO: Weight this to pick a random direction
+                # ind = random.randint(0, len(connections)-1)
                 current_room = connections[0]
                 visited.add(current_room)
                 return_path.append(current_room)
                 connections = []
                 if current_room.n_to:
                     connections.append(current_room.n_to)
-                if current_room.s_to:
-                    connections.append(current_room.s_to)
                 if current_room.e_to:
                     connections.append(current_room.e_to)
+                if current_room.s_to:
+                    connections.append(current_room.s_to)
                 if current_room.w_to:
                     connections.append(current_room.w_to)
 
@@ -120,7 +123,6 @@ def path_finder(world):
                         unexplored_connections = True
                     else:
                         connections.remove(c)
-            # TODO: Implement BFS to nearest unexplored
             new_path = bfs_nearest_unexplored(current_room, visited)
             current_room = new_path[-1]
             visited.add(current_room)
@@ -171,10 +173,10 @@ def bfs(source_room, destination_room):
             connections = []
             if vertex.n_to and vertex.n_to.id not in visited:
                 connections.append(vertex.n_to)
-            if vertex.s_to and vertex.s_to.id not in visited:
-                connections.append(vertex.s_to)
             if vertex.e_to and vertex.e_to.id not in visited:
                 connections.append(vertex.e_to)
+            if vertex.s_to and vertex.s_to.id not in visited:
+                connections.append(vertex.s_to)
             if vertex.w_to and vertex.w_to.id not in visited:
                 connections.append(vertex.w_to)
             for r in connections:
@@ -206,10 +208,10 @@ def bfs_nearest_unexplored(source_room, main_visited):
             connections = []
             if vertex.n_to and vertex.n_to.id not in visited:
                 connections.append(vertex.n_to)
-            if vertex.s_to and vertex.s_to.id not in visited:
-                connections.append(vertex.s_to)
             if vertex.e_to and vertex.e_to.id not in visited:
                 connections.append(vertex.e_to)
+            if vertex.s_to and vertex.s_to.id not in visited:
+                connections.append(vertex.s_to)
             if vertex.w_to and vertex.w_to.id not in visited:
                 connections.append(vertex.w_to)
             for r in connections:
